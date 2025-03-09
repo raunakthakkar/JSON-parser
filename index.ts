@@ -1,16 +1,40 @@
 import { parseArray, parseObject, pushValueToMap, getSubArrayByToken } from "./helpers";
 import { ITokenType, TokenType } from "./src/types";
 
-const dummyValue = {
-  key: "value",
-  "key-n": 101,
-  "key-o": {
-    nested:{
-      age: 20,
-    },
+const dummyValue = false? {
+  classs: "13",
+  name: "John",
+  classes:[{id:'french'},{id:'english'}],
+  age: 30,
+  isStudent: true,
+  isTeacher: false,
+  isNull: null,
+  subjects: ["Maths", "Science"],
+} : [
+  {
+    classs: "13",
+    name: "John",
+    classes:[{id:'french'},{id:'english'}],
+    age: 30,
+    isStudent: true,
+    isTeacher: false,
+    isNull: null,
+    subjects: ["Maths", "Science"],
   },
-  // "key-l": [],
-};
+  {
+    classs: "14",
+    name: "John-bhai",
+    classes:[{id:'science'},{id:'arts'}],
+    age: 56,
+    isStudent: true,
+    isTeacher: false,
+    isNull: null,
+    subjects: ["Maths", "Science"],
+  },
+  1,
+  2,
+  'a'
+];
 
 const TokenMap = new Map<string | RegExp, TokenType>();
 TokenMap.set("{", "BraceOpen");
@@ -50,44 +74,45 @@ class MyJSONParser {
     return tokenArr;
   }
   static parseTokenArr(tokenArr: ITokenType[]) {
-    let JSONobj: Record<string, any> = {};
     let tokenIndx = 0;
     let currToken = tokenArr[tokenIndx].token;
+    let JSONobj: Record<string, any> | Array<any> = currToken === 'BraceOpen' ? {} : [];
     while (tokenIndx !== tokenArr.length - 1) {
-      currToken = tokenArr[tokenIndx].token;
-      if (currToken == "Colon") {
-        const objKey = tokenArr[tokenIndx - 1].data;
-        const objValue = tokenArr[tokenIndx + 1];
-        try {
-          switch (objValue.token) {
-            case "BraceOpen": {
-              const subArr = getSubArrayByToken(
-                objValue.token,
-                ++tokenIndx,
-                tokenArr
-              );
-              console.log(subArr);
-              JSONobj[objKey] = parseObject(subArr);
-              tokenIndx = tokenIndx + subArr.length;
-              continue;
-            }
-            case "BraceOpen": {
-              const subArr = getSubArrayByToken(
-                objValue.token,
-                tokenIndx,
-                tokenArr
-              );
-              JSONobj[objKey] = parseArray(subArr);
-              tokenIndx = tokenIndx + subArr.length;
-              continue;
-            }
-            default: {
-              JSONobj[objKey] = objValue.data;
-            }
-          }
-        } catch (e) {
-          console.error(e);
+      if(tokenIndx >= tokenArr.length){
+        break;  
+      }
+      const currToken = tokenArr[tokenIndx].token;
+      console.log('currToken',currToken);
+      if(currToken === 'BraceOpen'){
+        const subArr = getSubArrayByToken(
+          currToken,
+          tokenIndx,
+          tokenArr
+        );
+         const parsedObj = parseObject(subArr);
+         if(Array.isArray(JSONobj)){
+          JSONobj = JSONobj.concat(parsedObj);
+        }else{
+          JSONobj = {...JSONobj,...parsedObj};
         }
+        tokenIndx = tokenIndx + subArr.length;
+        continue;
+      }else if(currToken === 'BracketOpen'){
+        const subArr = getSubArrayByToken(
+          currToken,
+          tokenIndx,
+          tokenArr
+        );
+        console.log('subArr',subArr);
+        const parsedArr = parseArray(subArr);
+        if(Array.isArray(JSONobj)){
+          console.log('parsedArr',parsedArr);
+          JSONobj = JSONobj.concat(parsedArr);
+        }else{
+          JSONobj = {...JSONobj,...parsedArr};
+        }
+        tokenIndx = tokenIndx + subArr.length;
+        continue;
       }
       tokenIndx++;
     }
@@ -96,4 +121,4 @@ class MyJSONParser {
   }
 }
 
-console.log(MyJSONParser.parse(dummyValue));
+console.dir(MyJSONParser.parse(dummyValue),{depth: null});
