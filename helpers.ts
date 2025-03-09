@@ -106,7 +106,6 @@ export const parseArray = (arr: ITokenType[]) => {
     }
       if (arr[counter].token === "BraceOpen") {
         const subArr = getSubArrayByToken(arr[counter].token, counter, arr);
-        console.log('raunak',subArr);
         const objValue = parseObject(subArr);
         parsedArr.push(objValue);
         counter = counter + subArr.length;

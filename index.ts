@@ -1,16 +1,7 @@
 import { parseArray, parseObject, pushValueToMap, getSubArrayByToken } from "./helpers";
 import { ITokenType, TokenType } from "./src/types";
 
-const dummyValue = false? {
-  classs: "13",
-  name: "John",
-  classes:[{id:'french'},{id:'english'}],
-  age: 30,
-  isStudent: true,
-  isTeacher: false,
-  isNull: null,
-  subjects: ["Maths", "Science"],
-} : [
+const dummyValue = [
   {
     classs: "13",
     name: "John",
@@ -35,6 +26,16 @@ const dummyValue = false? {
   2,
   'a'
 ];
+const dummyValue2 = {
+  classs: "13",
+  name: "John",
+  classes:[{id:'french'},{id:'english'}],
+  age: 30,
+  isStudent: true,
+  isTeacher: false,
+  isNull: null,
+  subjects: ["Maths", "Science"],
+};
 
 const TokenMap = new Map<string | RegExp, TokenType>();
 TokenMap.set("{", "BraceOpen");
@@ -82,7 +83,6 @@ class MyJSONParser {
         break;  
       }
       const currToken = tokenArr[tokenIndx].token;
-      console.log('currToken',currToken);
       if(currToken === 'BraceOpen'){
         const subArr = getSubArrayByToken(
           currToken,
@@ -103,10 +103,9 @@ class MyJSONParser {
           tokenIndx,
           tokenArr
         );
-        console.log('subArr',subArr);
+
         const parsedArr = parseArray(subArr);
         if(Array.isArray(JSONobj)){
-          console.log('parsedArr',parsedArr);
           JSONobj = JSONobj.concat(parsedArr);
         }else{
           JSONobj = {...JSONobj,...parsedArr};
@@ -122,3 +121,4 @@ class MyJSONParser {
 }
 
 console.dir(MyJSONParser.parse(dummyValue),{depth: null});
+console.dir(MyJSONParser.parse(dummyValue2),{depth: null});
